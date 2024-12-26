@@ -3,33 +3,40 @@ const input = form.elements.email;
 const textarea = form.elements.message;
 const STORAGE_KEY = 'feedback-form-state';
 
-populateForm();
+let formData = { email: '', message: '' };
 
-form.addEventListener('input', getFormInformation);
-function getFormInformation() {
-  const formObj = {
-    email: input.value.trim(),
-    message: textarea.value.trim(),
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formObj));
+clearFormOnReload();
+
+form.addEventListener('input', event => {
+  if (event.target.name === 'email' || event.target.name === 'message') {
+    formData[event.target.name] = event.target.value.trim();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  }
+});
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  const { email, message } = formData;
+
+  if (email && message) {
+    console.log(formData);
+    localStorage.removeItem(STORAGE_KEY);
+    formData = { email: '', message: '' };
+    form.reset();
+  } else {
+    alert('Fill please all fields');
+  }
+});
+
+function clearFormOnReload() {
+  localStorage.removeItem(STORAGE_KEY);
+  form.reset();
 }
 
 function populateForm() {
-  const savedFormInfo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-  input.value = savedFormInfo.email ?? '';
-  if (savedFormInfo) {
-    textarea.value = savedFormInfo.message ?? '';
-  }
-}
+  const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  formData = { ...formData, ...savedData };
 
-form.addEventListener('submit', sentInformation);
-function sentInformation(event) {
-  event.preventDefault();
-  const savedFormInfo = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-
-  if (savedFormInfo.email && savedFormInfo.message) {
-    console.log(savedFormInfo);
-  }
-  localStorage.removeItem(STORAGE_KEY);
-  form.reset();
+  input.value = formData.email || '';
+  textarea.value = formData.message || '';
 }
