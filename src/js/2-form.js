@@ -5,7 +5,7 @@ const STORAGE_KEY = 'feedback-form-state';
 
 let formData = { email: '', message: '' };
 
-clearFormOnReload();
+populateForm();
 
 form.addEventListener('input', event => {
   if (event.target.name === 'email' || event.target.name === 'message') {
@@ -27,11 +27,6 @@ form.addEventListener('submit', event => {
     alert('Fill please all fields');
   }
 });
-
-function clearFormOnReload() {
-  localStorage.removeItem(STORAGE_KEY);
-  form.reset();
-}
 
 function populateForm() {
   const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
